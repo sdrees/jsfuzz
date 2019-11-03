@@ -28,7 +28,7 @@ Features of the fuzz target:
 
 * Jsfuzz will call the fuzz target in an infinite loop with random data (according to the coverage guided algorithm) passed to `buf`( in a separate process).
 * The function must catch and ignore any expected exceptions that arise when passing invalid input to the tested package.
-* The fuzz target must call the test function/library with wither the passed buffer or a transformation on the test buffer 
+* The fuzz target must call the test function/library with with the passed buffer or a transformation on the test buffer 
 if the structure is different or from different type.
 * Fuzz functions can also implement application level checks to catch application/logical bugs - For example: 
 decode the buffer with the testable library, encode it again, and check that both results are equal. To communicate the results
@@ -52,7 +52,7 @@ function fuzz(buf) {
             e.message.indexOf('Failed to') !== -1 ||
             e.message.indexOf('DecoderBuffer') !== -1 ||
             e.message.indexOf('invalid table spec') !== -1 ||
-            e.message.indexOf('SOI not found1) !== -1) {
+            e.message.indexOf('SOI not found') !== -1) {
         } else {
             throw e;
         }
@@ -109,15 +109,20 @@ jsfuzz tries to mimic some of the arguments and output style from [libFuzzer](ht
 More fuzz targets examples (for real and popular libraries) are located under the examples directory and
 bugs that were found using those targets are listed in the trophies section.
 
+## Other languages
+
+Currently this library is also ported to python via [pythonfuzz](https://github.com/fuzzitdev/jsfuzz)
+
 ## Credits & Acknowledgments
 
 jsfuzz logic is heavily based on [go-fuzz](https://github.com/dvyukov/go-fuzz) originally developed by [Dmitry Vyukov's](https://twitter.com/dvyukov).
 Which is in turn heavily based on [Michal Zalewski](https://twitter.com/lcamtuf) [AFL](http://lcamtuf.coredump.cx/afl/).
 
-A previous take on that was done by [https://github.com/connor4312/js-fuzz] with a bit different design, coverage and
+A previous take on that was done by https://github.com/connor4312/js-fuzz with a bit different design, coverage and
 interface but it looks like it is currently unmaintained.
 
 For coverage jsfuzz is using [istanbuljs](https://istanbul.js.org) instrumentation and coverage library. 
+
 
 ## Contributions
 
@@ -129,6 +134,9 @@ any unnecessary work is done.
 ## Trophies
 * [jpeg-js: OOM/DoS](https://github.com/eugeneware/jpeg-js/issues/53)
 * [@webassemblyjs/wast-parser: Crash/TypeError](https://github.com/xtuc/webassemblyjs/issues/669)
-* [decompress: Crash/TypeError ](https://github.com/kevva/decompress/issues/72) 
+* [decompress: Crash/TypeError ](https://github.com/kevva/decompress/issues/72)
+* [qs: logic bug/inequality](https://github.com/ljharb/qs/issues/340)
+* [js-yaml: Crash/TypeError](https://github.com/nodeca/js-yaml/issues/524)
+* [js-yaml: Crash/TypeError](https://github.com/nodeca/js-yaml/issues/525)
 
 **Feel free to add bugs that you found with jsfuzz to this list via pull-request**

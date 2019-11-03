@@ -43,7 +43,9 @@ export class Corpus {
 
     generateInput() {
         if (this.inputs.length === 0) {
-            return this.mutate(Buffer.alloc(1, 0))
+            const buf = Buffer.alloc(0, 0)
+            this.putBuffer(buf);
+            return buf;
         }
         const buffer = this.inputs[this.rand(this.inputs.length)];
         return this.mutate(buffer);
@@ -66,8 +68,23 @@ export class Corpus {
         return Math.floor(Math.random() * Math.floor(n));
     }
 
-    exp2() {
-        return Math.round(Math.log2(this.rand(2**32)));
+    dec2bin(dec: number){
+        const bin = dec.toString(2);
+        return '0'.repeat(32 - bin.length) + bin;
+    }
+
+    // Exp2 generates n with probability 1/2^(n+1).
+    Exp2() {
+        const bin = this.dec2bin(this.rand(2**32));
+        let count = 0;
+        for (let i=0; i<32; i++) {
+            if(bin[i] === '0') {
+                count += 1;
+            } else {
+                break;
+            }
+        }
+        return count;
     }
 
     chooseLen(n: number) {
@@ -84,7 +101,7 @@ export class Corpus {
     mutate(buf: Buffer) {
         let res = Buffer.allocUnsafe(buf.length);
         buf.copy(res, 0, 0, buf.length);
-        const nm = 1 + this.exp2();
+        const nm = 1 + this.Exp2();
         for (let i=0; i<nm; i++) {
             const x = this.rand(16);
             if ( x ===0 ) {
@@ -102,7 +119,7 @@ export class Corpus {
                 // Insert a range of random bytes.
                 const pos = this.rand(res.length + 1);
                 const n = this.chooseLen(10);
-                res = Buffer.concat([res, Buffer.alloc(n, 0)], res.length + n)
+                res = Buffer.concat([res, Buffer.alloc(n, 0)], res.length + n);
                 res.copy(res, pos + n, pos);
                 for (let k = 0; k < n; k++) {
                     res[pos + k] = this.rand(256)
