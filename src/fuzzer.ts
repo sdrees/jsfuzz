@@ -33,6 +33,7 @@ export class Fuzzer {
     private regression: boolean;
     private verse: Verse | null;
     private readonly versifier: boolean;
+    private readonly onlyAscii: boolean;
 
     constructor(target: string,
                 dir: string[],
@@ -40,9 +41,11 @@ export class Fuzzer {
                 rssLimitMb: number,
                 timeout: number,
                 regression: boolean,
+                onlyAscii: boolean,
                 versifier: boolean) {
         this.target = target;
-        this.corpus = new Corpus(dir);
+        this.corpus = new Corpus(dir, onlyAscii);
+        this.onlyAscii = onlyAscii;
         this.versifier = versifier;
         this.verse = null;
         this.total_executions = 0;
@@ -119,8 +122,8 @@ export class Fuzzer {
                 return;
             } else if (m.coverage > this.total_coverage) {
                 this.total_coverage = m.coverage;
-                this.logStats('NEW');
                 this.corpus.putBuffer(buf);
+                this.logStats('NEW');
                 if (buf.length > 0 && this.versifier) {
                     this.verse = BuildVerse(this.verse, buf);
                 }
@@ -162,9 +165,6 @@ export class Fuzzer {
         });
 
         this.pulseInterval = setInterval(() => {
-            // @ts-ignore
-            const diff = Date.now() - this.startTime;
-            const execs_per_sec = Math.trunc(executions/diff*1000);
             this.logStats("PULSE");
         }, 3000);
 
